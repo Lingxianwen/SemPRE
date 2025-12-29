@@ -1,0 +1,106 @@
+{
+  "protocol": "dns",
+  "syntax_groundtruth": {
+    "0100": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "8180": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "0000": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "8400": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "8183": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "default": [
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+    ]
+  },
+  "semantic_types_mapping": {
+    "Static": "HEADER",
+    "Group": "COMMAND",
+    "String": "STRING",
+    "Bit Field": "FLAGS",
+    "Bytes": "PAYLOAD"
+  },
+  "semantic_functions_mapping": {
+    "Command": "CONTROL_CMD",
+    "Length": "DATA_LENGTH",
+    "Delim": "DELIMITER",
+    "CheckSum": "VALIDATION",
+    "Aligned": "RESERVED",
+    "Filename": "FILENAME"
+  },
+  "unified_semantic_types": [
+    "PADDING",
+    "HEADER",
+    "ADDRESS",
+    "COMMAND",
+    "LENGTH",
+    "DATA",
+    "CHECKSUM",
+    "CONTROL",
+    "FUNCTION",
+    "OPTION",
+    "TIMESTAMP",
+    "VERSION",
+    "FLAGS",
+    "PAYLOAD",
+    "STRING",
+    "SIGNATURE",
+    "IDENTIFIER"
+  ],
+  "unified_semantic_functions": [
+    "UNKNOWN",
+    "IDENTIFIER",
+    "ADDRESSING",
+    "CONTROL_CMD",
+    "DATA_LENGTH",
+    "PAYLOAD",
+    "VALIDATION",
+    "RESERVED",
+    "PROTOCOL_SPECIFIC",
+    "CONFIGURATION",
+    "SESSION_MGMT",
+    "SECURITY",
+    "ROUTING",
+    "APPLICATION_DATA",
+    "DELIMITER",
+    "FILENAME",
+    "MESSAGE_TYPE"
+  ]
+}

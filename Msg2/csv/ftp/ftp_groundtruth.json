@@ -1,0 +1,218 @@
+{
+  "protocol": "ftp",
+  "syntax_groundtruth": {
+    "55534552": [
+      0,
+      4,
+      5
+    ],
+    "50415353": [
+      0,
+      4,
+      5
+    ],
+    "5057440d": [
+      0,
+      3,
+      4,
+      5
+    ],
+    "43574420": [
+      0,
+      3,
+      4
+    ],
+    "4c495354": [
+      0,
+      4,
+      5
+    ],
+    "52455452": [
+      0,
+      4,
+      5
+    ],
+    "53544f52": [
+      0,
+      4,
+      5
+    ],
+    "51554954": [
+      0,
+      4,
+      5,
+      6
+    ],
+    "54595045": [
+      0,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "504f5254": [
+      0,
+      4,
+      5
+    ],
+    "32323020": [
+      0,
+      3,
+      4
+    ],
+    "3232302d": [
+      0,
+      3,
+      4
+    ],
+    "32333020": [
+      0,
+      3,
+      4
+    ],
+    "33333120": [
+      0,
+      3,
+      4
+    ],
+    "32353020": [
+      0,
+      3,
+      4
+    ],
+    "31353020": [
+      0,
+      3,
+      4
+    ],
+    "32323620": [
+      0,
+      3,
+      4
+    ],
+    "34323520": [
+      0,
+      3,
+      4
+    ],
+    "35303020": [
+      0,
+      3,
+      4
+    ],
+    "34323120": [
+      0,
+      3,
+      4
+    ],
+    "35333020": [
+      0,
+      3,
+      4
+    ],
+    "35353020": [
+      0,
+      3,
+      4
+    ],
+    "32353720": [
+      0,
+      3,
+      4
+    ],
+    "32303020": [
+      0,
+      3,
+      4
+    ],
+    "32313320": [
+      0,
+      3,
+      4
+    ],
+    "32323720": [
+      0,
+      3,
+      4
+    ],
+    "32323120": [
+      0,
+      3,
+      4
+    ],
+    "3233302d": [
+      0,
+      3,
+      4
+    ],
+    "3235302d": [
+      0,
+      3,
+      4
+    ],
+    "3333312d": [
+      0,
+      3,
+      4
+    ],
+    "default": [
+      0,
+      3,
+      4
+    ]
+  },
+  "semantic_types_mapping": {
+    "Static": "HEADER",
+    "Group": "COMMAND",
+    "String": "STRING",
+    "Bit Field": "FLAGS",
+    "Bytes": "PAYLOAD"
+  },
+  "semantic_functions_mapping": {
+    "Command": "CONTROL_CMD",
+    "Length": "DATA_LENGTH",
+    "Delim": "DELIMITER",
+    "CheckSum": "VALIDATION",
+    "Aligned": "RESERVED",
+    "Filename": "FILENAME"
+  },
+  "unified_semantic_types": [
+    "PADDING",
+    "HEADER",
+    "ADDRESS",
+    "COMMAND",
+    "LENGTH",
+    "DATA",
+    "CHECKSUM",
+    "CONTROL",
+    "FUNCTION",
+    "OPTION",
+    "TIMESTAMP",
+    "VERSION",
+    "FLAGS",
+    "PAYLOAD",
+    "STRING",
+    "SIGNATURE",
+    "IDENTIFIER"
+  ],
+  "unified_semantic_functions": [
+    "UNKNOWN",
+    "IDENTIFIER",
+    "ADDRESSING",
+    "CONTROL_CMD",
+    "DATA_LENGTH",
+    "PAYLOAD",
+    "VALIDATION",
+    "RESERVED",
+    "PROTOCOL_SPECIFIC",
+    "CONFIGURATION",
+    "SESSION_MGMT",
+    "SECURITY",
+    "ROUTING",
+    "APPLICATION_DATA",
+    "DELIMITER",
+    "FILENAME",
+    "MESSAGE_TYPE"
+  ]
+}
