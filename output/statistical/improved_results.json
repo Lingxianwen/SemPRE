@@ -1,0 +1,118 @@
+{
+  "exp1_format_inference": {
+    "precision": 0.6344494047619048,
+    "recall": 0.3153787556689342,
+    "f1_score": 0.4141981034838177,
+    "perfect_score": 0.0,
+    "detection_method": "statistical",
+    "total_samples": 1344
+  },
+  "exp2_constraint_discovery": {
+    "length_fields_detected": 0,
+    "length_constraints": 0,
+    "arithmetic_constraints": 0,
+    "logical_constraints": 0,
+    "total_constraints": 0,
+    "constraint_details": [],
+    "sdg_stats": {
+      "arithmetic_constraints": 0,
+      "logical_constraints": 0,
+      "edge_count": 0
+    }
+  },
+  "exp3_function_inference": {
+    "inferred_functions": 14,
+    "signatures": [
+      {
+        "func_code": "0x00",
+        "label": "WRITE",
+        "confidence": 0.8,
+        "fingerprint": "ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,16B) | FIELDS(5) | SIZE(21B)"
+      },
+      {
+        "func_code": "0x04",
+        "label": "Filesystem_Op",
+        "confidence": 0.4666666666666666,
+        "fingerprint": "COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)"
+      },
+      {
+        "func_code": "0x4F",
+        "label": "WRITE",
+        "confidence": 0.8,
+        "fingerprint": "ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,23B) | FIELDS(7) | SIZE(30B)"
+      },
+      {
+        "func_code": "0x30",
+        "label": "Filesystem_Op",
+        "confidence": 0.7,
+        "fingerprint": "COUNT_FIELDS(1) | PAYLOAD(fixed,73B) | FIELDS(22) | SIZE(89B)"
+      },
+      {
+        "func_code": "0x32",
+        "label": "WRITE",
+        "confidence": 0.8,
+        "fingerprint": "ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(count_dependent,212B) | FIELDS(57) | SIZE(228B)"
+      },
+      {
+        "func_code": "0x05",
+        "label": "Filesystem_Op",
+        "confidence": 0.7,
+        "fingerprint": "COUNT_FIELDS(1) | PAYLOAD(fixed,223B) | FIELDS(59) | SIZE(239B)"
+      },
+      {
+        "func_code": "0xA3",
+        "label": "READ",
+        "confidence": 0.6000000000000001,
+        "fingerprint": "ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)"
+      },
+      {
+        "func_code": "0x83",
+        "label": "READ",
+        "confidence": 0.6000000000000001,
+        "fingerprint": "ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)"
+      },
+      {
+        "func_code": "0x01",
+        "label": "Filesystem_Op",
+        "confidence": 0.4666666666666666,
+        "fingerprint": "COUNT_FIELDS(1) | PAYLOAD(fixed,13B) | FIELDS(4) | SIZE(17B)"
+      },
+      {
+        "func_code": "0xC2",
+        "label": "Filesystem_Op",
+        "confidence": 0.4666666666666666,
+        "fingerprint": "COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)"
+      }
+    ]
+  },
+  "exp4_data_efficiency": {
+    "ratios": [
+      0.1,
+      0.3,
+      0.5,
+      1.0
+    ],
+    "results": [
+      {
+        "data_ratio": 0.1,
+        "sample_size": 134,
+        "f1_score": 0.3922470978441127
+      },
+      {
+        "data_ratio": 0.3,
+        "sample_size": 403,
+        "f1_score": 0.5561352212716976
+      },
+      {
+        "data_ratio": 0.5,
+        "sample_size": 672,
+        "f1_score": 0.41148225903865004
+      },
+      {
+        "data_ratio": 1.0,
+        "sample_size": 1344,
+        "f1_score": 0.4141981034838177
+      }
+    ]
+  }
+}

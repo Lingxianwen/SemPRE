@@ -261,14 +261,17 @@ class ZeroShotFunctionInferencer:
     def _extract_structural_fingerprint(self, profile: Any,
                                         messages: List[bytes]) -> StructuralFingerprint:
         """
-        提取结构指纹
+        提取结构指纹（协议无关）
 
         这是零样本推理的核心：从消息结构中提取特征
+        不假设任何字段的固定位置
         """
         # 收集该功能码的所有消息
         func_code = getattr(profile, 'code', 0)
+        byte_position = getattr(profile, 'byte_position', 0)  # 从profile获取类型字段位置
+
         func_messages = [msg for msg in messages
-                        if len(msg) > 0 and msg[0] == func_code]
+                        if len(msg) > byte_position and msg[byte_position] == func_code]
 
         if not func_messages:
             return StructuralFingerprint(
@@ -282,14 +285,14 @@ class ZeroShotFunctionInferencer:
         avg_size = np.mean(sizes)
         size_std = np.std(sizes)
 
-        # 检测地址字段（通常在偏移1-4）
-        has_address, num_address = self._detect_address_fields(func_messages)
+        # 检测地址字段（在消息中搜索，不假设位置）
+        has_address, num_address = self._detect_address_fields_generic(func_messages)
 
         # 检测计数字段
-        has_count, num_count = self._detect_count_fields(func_messages)
+        has_count, num_count = self._detect_count_fields_generic(func_messages)
 
         # 检测数据载荷
-        has_payload, payload_pattern, avg_payload = self._detect_payload(func_messages)
+        has_payload, payload_pattern, avg_payload = self._detect_payload_generic(func_messages)
 
         # 估计字段数量（简化：每4字节一个字段）
         estimated_fields = int(avg_size / 4)
@@ -308,73 +311,79 @@ class ZeroShotFunctionInferencer:
 
         return fingerprint
 
-    def _detect_address_fields(self, messages: List[bytes]) -> Tuple[bool, int]:
+    def _detect_address_fields_generic(self, messages: List[bytes]) -> Tuple[bool, int]:
         """
-        检测地址字段
+        检测地址字段（协议无关）
 
-        特征：通常是2-4字节，位于消息前部，值在合理范围内
+        特征：2-4字节整数，值在合理范围，跨消息有变化
+        搜索整个消息，不假设固定位置
         """
         if not messages or len(messages[0]) < 4:
             return False, 0
 
-        # 检查偏移1-2的2字节值
-        values = []
-        for msg in messages:
-            if len(msg) >= 4:
-                val = int.from_bytes(msg[1:3], 'big')
-                values.append(val)
+        # 尝试多个可能的位置
+        for offset in range(min(20, len(messages[0]) - 2)):
+            values = []
+            for msg in messages[:min(50, len(messages))]:
+                if offset + 2 <= len(msg):
+                    val = int.from_bytes(msg[offset:offset+2], 'big')
+                    values.append(val)
 
-        if not values:
-            return False, 0
+            if not values:
+                continue
 
-        # 如果值的范围在合理范围内（0-65535），且不是全相同
-        unique_vals = len(set(values))
-        if unique_vals > 1 and max(values) < 65536:
-            return True, 1
-
-        return False, 0
-
-    def _detect_count_fields(self, messages: List[bytes]) -> Tuple[bool, int]:
-        """
-        检测计数字段
-
-        特征：通常是1-2字节，值较小（<256）
-        """
-        if not messages or len(messages[0]) < 6:
-            return False, 0
-
-        # 检查偏移3-4的值
-        values = []
-        for msg in messages:
-            if len(msg) >= 5:
-                val = msg[4] if len(msg) > 4 else 0
-                values.append(val)
-
-        if not values:
-            return False, 0
-
-        # 如果值通常较小
-        if max(values) < 256 and len(set(values)) > 1:
-            return True, 1
+            # 检查是否符合地址字段特征
+            unique_vals = len(set(values))
+            if unique_vals > 1 and unique_vals < len(values) * 0.9:  # 有变化但不是完全随机
+                if max(values) < 65536:  # 合理范围
+                    return True, 1
 
         return False, 0
 
-    def _detect_payload(self, messages: List[bytes]) -> Tuple[bool, str, float]:
+    def _detect_count_fields_generic(self, messages: List[bytes]) -> Tuple[bool, int]:
         """
-        检测数据载荷
+        检测计数字段（协议无关）
 
-        返回: (是否有载荷, 载荷模式, 平均载荷大小)
+        特征：1-2字节，值较小（<256），可能与payload大小相关
+        """
+        if not messages or len(messages[0]) < 4:
+            return False, 0
+
+        # 尝试多个位置
+        for offset in range(min(20, len(messages[0]) - 1)):
+            values = []
+            for msg in messages[:min(50, len(messages))]:
+                if offset < len(msg):
+                    val = msg[offset]
+                    values.append(val)
+
+            if not values:
+                continue
+
+            # 计数字段特征：值较小，有变化
+            if max(values) < 256 and len(set(values)) > 1:
+                return True, 1
+
+        return False, 0
+
+    def _detect_payload_generic(self, messages: List[bytes]) -> Tuple[bool, str, float]:
+        """
+        检测数据载荷（协议无关）
+
+        策略：假设消息后半部分可能是payload
         """
         if not messages:
             return False, 'none', 0.0
 
-        # 估计头部大小（简化：假设前8字节是头部）
-        header_size = 8
+        # 估计头部大小：使用消息的前1/4或前16字节（取较小值）
+        avg_len = np.mean([len(msg) for msg in messages])
+        estimated_header = min(16, int(avg_len * 0.25))
+
         payload_sizes = []
 
         for msg in messages:
-            if len(msg) > header_size:
-                payload_size = len(msg) - header_size
+            if len(msg) > estimated_header:
+                payload_size = len(msg) - estimated_header
                 payload_sizes.append(payload_size)
 
         if not payload_sizes:

@@ -1,16 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SemPRE: Improved Experiment Runner with Protocol-Specific Knowledge
-改进版实验运行器 - 利用协议特定知识提升准确率
+SemPRE: 真正的协议逆向工程实验运行器（Protocol-Agnostic Version）
 
-主要改进：
-1. 协议感知的字段边界检测
-2. 正确加载和使用 Ground Truth
-3. 改进的长度字段检测
-4. 更准确的约束发现
+核心改进 - 移除所有硬编码知识，实现真正的统计学习：
 
-Author: SemPRE Research Team (Improved Version)
+1. **纯统计的字段边界检测**（无协议假设）
+   - 字节级熵分析（Shannon Entropy）
+   - 重合指数（Index of Coincidence）
+   - 熵梯度边界检测
+
+2. **零样本功能语义推理**（无位置假设）
+   - 自动发现类型字段位置（基于低熵特征）
+   - 结构指纹提取（地址/计数/Payload模式）
+   - 规则匹配（READ/WRITE/Control分类）
+
+3. **协议无关的约束发现**
+   - 长度字段自动检测（测试多种长度关系）
+   - 公式自动发现（len(msg), len(msg)-offset等）
+   - SDG构建（算术/逻辑/位级依赖）
+
+4. **科学评估指标**
+   - F1/Precision/Recall（边界检测准确率）
+   - Perfect Score（完全匹配率）
+   - 数据效率曲线（10%/30%/50%/100%）
+
+评估与原始SemPRE的区别：
+- 原始版本：硬编码Modbus规则 → 高分但无泛化能力
+- 本版本：纯统计学习 → 真实反映算法学习能力
+
+Author: SemPRE Research Team (Protocol-Agnostic Version)
+Date: 2025
 """
 
 import os
@@ -52,86 +72,32 @@ class ProtocolFieldSpec:
     confidence: float = 1.0
 
 
-class ProtocolKnowledgeBase:
-    """
-    协议知识库 - 利用已知协议规范提升检测准确率
-    """
-    
-    @staticmethod
-    def get_modbus_standard_fields() -> List[ProtocolFieldSpec]:
-        """
-        返回 Modbus TCP 标准字段定义
-        基于 Modbus 协议规范：
-        - Bytes 0-1: Transaction ID
-        - Bytes 2-3: Protocol ID (0x0000)
-        - Bytes 4-5: Length (remaining bytes)
-        - Byte 6: Unit ID
-        - Byte 7: Function Code
-        - Bytes 8+: Data (功能码相关)
-        """
-        return [
-            ProtocolFieldSpec(0, 1, 'transaction_id', 'identifier', 1.0),
-            ProtocolFieldSpec(1, 3, 'transaction_id_full', 'identifier', 1.0),
-            ProtocolFieldSpec(2, 3, 'protocol_id_h', 'constant', 1.0),
-            ProtocolFieldSpec(3, 5, 'protocol_id', 'constant', 1.0),
-            ProtocolFieldSpec(4, 5, 'length_h', 'length', 1.0),
-            ProtocolFieldSpec(5, 6, 'length_l', 'length', 1.0),
-            ProtocolFieldSpec(6, 7, 'unit_id', 'identifier', 1.0),
-            ProtocolFieldSpec(7, 9, 'function_code_and_start', 'command', 1.0),
-            # 功能码在偏移7
-            # 后续字段取决于功能码
-        ]
-    
-    @staticmethod
-    def get_modbus_boundaries_by_function(func_code: int, msg_length: int) -> List[int]:
-        """
-        根据 Modbus 功能码返回标准边界
-        这些边界来自 Modbus 协议规范和CSV Ground Truth
-        
-        注意：边界不包含消息末尾位置（与CSV格式一致）
-        """
-        # 基础头部边界（所有功能码共享）
-        # 对应：TransID(0-1) | TransID(1-3) | ProtoID(3-5) | Length(5-6) | UnitID(6-7) | FuncCode(7-8) | Data(8-9)
-        base_boundaries = [1, 3, 5, 6, 7]
-        
-        # 功能码 0x01-0x06: Read/Write Single
-        if func_code in [0x01, 0x02, 0x03, 0x04, 0x05, 0x06]:
-            # 标准格式：7字节头部 + 2字节数据字段
-            boundaries = base_boundaries + [9]
-            # 不添加消息末尾，与CSV格式保持一致
-            return boundaries
-        
-        # 功能码 0x0F, 0x10: Write Multiple
-        elif func_code in [0x0F, 0x10]:
-            # 标准格式：7字节头部 + 地址(2) + 数量(2) + 字节数(1) + 数据
-            boundaries = base_boundaries + [9, 11, 12]
-            # 不添加消息末尾
-            return boundaries
-        
-        # 其他功能码：使用通用边界
-        else:
-            boundaries = base_boundaries + [9]
-            return boundaries
+# ProtocolKnowledgeBase 已移除 - 不使用任何硬编码的协议知识
 
 
-class ImprovedFieldDetector:
+class StatisticalFieldDetector:
     """
-    改进的字段检测器 - 结合启发式和协议知识
+    统计学习的字段检测器 - 纯基于熵和重合指数
+
+    核心算法：
+    1. 字节级熵分析 - 识别高熵（变化）和低熵（常量/类型）位置
+    2. 重合指数 (Index of Coincidence) - 检测字段边界
+    3. 序列对齐 - 发现跨消息的字段模式
     """
-    
-    def __init__(self, protocol: str = 'modbus', logger=None):
+
+    def __init__(self, protocol: str = 'unknown', logger=None):
         self.protocol = protocol
         self.logger = logger or logging.getLogger(__name__)
-        self.knowledge_base = ProtocolKnowledgeBase()
     
     def detect_fields(self, messages: List[bytes]) -> Tuple[List[Any], Dict]:
         """
-        检测字段边界
-        
-        策略：
-        1. 首先使用协议特定知识
-        2. 然后用启发式方法补充
-        3. 最后验证和合并
+        纯统计学习的字段边界检测（协议无关）
+
+        算法：
+        1. 字节级熵分析
+        2. 重合指数计算
+        3. 边界候选生成
+        4. 跨消息一致性验证
         """
         @dataclass
         class DetectedField:
@@ -139,176 +105,458 @@ class ImprovedFieldDetector:
             end: int
             field_type: str = 'unknown'
             confidence: float = 0.8
-            source: str = 'heuristic'  # 'protocol' or 'heuristic'
-        
+            source: str = 'statistical'
+
+        if not messages:
+            return [], {'boundaries_per_message': [], 'detection_method': 'statistical'}
+
+        # 步骤1: 计算字节级统计特征
+        byte_entropy = self._calculate_byte_entropy(messages)
+        byte_ioc = self._calculate_index_of_coincidence(messages)
+
+        self.logger.info(f"  字节熵范围: {np.min(byte_entropy):.2f} - {np.max(byte_entropy):.2f}")
+        self.logger.info(f"  重合指数范围: {np.min(byte_ioc):.3f} - {np.max(byte_ioc):.3f}")
+
+        # 步骤2: 检测全局边界候选
+        boundary_candidates = self._detect_boundary_candidates(byte_entropy, byte_ioc)
+
+        self.logger.info(f"  边界候选: {boundary_candidates}")
+
+        # 步骤3: 为每条消息生成字段
         all_fields = []
         boundaries_per_message = []
-        
+
         for msg in messages:
+            # 使用统计边界分割消息
+            msg_boundaries = [b for b in boundary_candidates if b < len(msg)]
+
+            # 创建字段
             msg_fields = []
-            
-            # 步骤1: 使用协议知识（高优先级）
-            if self.protocol == 'modbus' and len(msg) >= 8:
-                func_code = msg[7]
-                protocol_boundaries = self.knowledge_base.get_modbus_boundaries_by_function(
-                    func_code, len(msg)
-                )
-                
-                # 创建字段
-                prev_boundary = 0
-                for boundary in protocol_boundaries:
-                    if boundary > prev_boundary and boundary <= len(msg):
-                        msg_fields.append(DetectedField(
-                            start=prev_boundary,
-                            end=boundary,
-                            field_type='protocol_defined',
-                            confidence=0.95,
-                            source='protocol'
-                        ))
-                        prev_boundary = boundary
-                
-                # 存储边界（用于评估）
-                boundaries_per_message.append(protocol_boundaries)
-            
-            else:
-                # 步骤2: 使用启发式方法
-                heuristic_fields = self._detect_fields_heuristic(msg)
-                msg_fields.extend(heuristic_fields)
-                
-                # 提取边界
-                boundaries = [0] + [f.end for f in heuristic_fields]
-                boundaries_per_message.append(sorted(set(boundaries)))
-            
+            prev_boundary = 0
+            for boundary in msg_boundaries:
+                if boundary > prev_boundary:
+                    field_type = self._infer_field_type_statistical(
+                        msg, prev_boundary, boundary, byte_entropy
+                    )
+                    msg_fields.append(DetectedField(
+                        start=prev_boundary,
+                        end=boundary,
+                        field_type=field_type,
+                        confidence=0.7,
+                        source='statistical'
+                    ))
+                    prev_boundary = boundary
+
+            # 处理剩余部分
+            if prev_boundary < len(msg):
+                msg_fields.append(DetectedField(
+                    start=prev_boundary,
+                    end=len(msg),
+                    field_type='payload',
+                    confidence=0.6,
+                    source='statistical'
+                ))
+
             all_fields.extend(msg_fields)
-        
+            boundaries_per_message.append(msg_boundaries)
+
         metadata = {
             'boundaries_per_message': boundaries_per_message,
-            'detection_method': 'protocol_aware' if self.protocol == 'modbus' else 'heuristic'
+            'detection_method': 'statistical',
+            'byte_entropy': byte_entropy.tolist() if isinstance(byte_entropy, np.ndarray) else byte_entropy,
+            'boundary_candidates': boundary_candidates
         }
-        
+
         return all_fields, metadata
     
-    def _detect_fields_heuristic(self, msg: bytes) -> List[Any]:
-        """启发式字段检测（当协议知识不可用时）"""
-        @dataclass
-        class DetectedField:
-            start: int
-            end: int
-            field_type: str = 'unknown'
-            confidence: float = 0.6
-            source: str = 'heuristic'
-        
-        fields = []
-        
-        # 简单的固定边界策略（基于常见协议模式）
-        common_boundaries = [1, 2, 3, 4, 6, 8]
-        
-        prev = 0
-        for boundary in common_boundaries:
-            if boundary < len(msg):
-                fields.append(DetectedField(prev, boundary))
-                prev = boundary
-        
-        if prev < len(msg):
-            fields.append(DetectedField(prev, len(msg)))
-        
-        return fields
+    def _calculate_byte_entropy(self, messages: List[bytes]) -> np.ndarray:
+        """
+        计算每个字节位置的熵（论文方法）
+
+        高熵 -> 数据/ID字段
+        低熵 -> 类型/命令字段
+        """
+        if not messages:
+            return np.array([])
+
+        max_len = max(len(msg) for msg in messages)
+        entropies = []
+
+        for pos in range(max_len):
+            values = []
+            for msg in messages:
+                if pos < len(msg):
+                    values.append(msg[pos])
+
+            if not values:
+                entropies.append(0.0)
+                continue
+
+            # 计算香农熵
+            counter = Counter(values)
+            total = len(values)
+            entropy = 0.0
+            for count in counter.values():
+                p = count / total
+                if p > 0:
+                    entropy -= p * np.log2(p)
+
+            entropies.append(entropy)
+
+        return np.array(entropies)
+
+    def _calculate_index_of_coincidence(self, messages: List[bytes]) -> np.ndarray:
+        """
+        计算重合指数 (Index of Coincidence)
+
+        用于检测字段边界：边界处IoC通常有突变
+        """
+        if not messages:
+            return np.array([])
+
+        max_len = max(len(msg) for msg in messages)
+        ioc_values = []
+
+        for pos in range(max_len):
+            values = []
+            for msg in messages:
+                if pos < len(msg):
+                    values.append(msg[pos])
+
+            if len(values) < 2:
+                ioc_values.append(0.0)
+                continue
+
+            # IoC = Σ[n_i * (n_i - 1)] / [N * (N - 1)]
+            counter = Counter(values)
+            N = len(values)
+            ioc = sum(count * (count - 1) for count in counter.values()) / (N * (N - 1))
+            ioc_values.append(ioc)
+
+        return np.array(ioc_values)
+
+    def _detect_boundary_candidates(self, byte_entropy: np.ndarray,
+                                    byte_ioc: np.ndarray) -> List[int]:
+        """
+        改进的边界检测（参考CrossPRE）
+
+        策略：
+        1. 熵梯度检测（更严格的阈值）
+        2. IoC突变检测
+        3. 跨消息一致性验证
+        4. 邻近边界合并
+        5. 基于消息长度聚类
+        """
+        if len(byte_entropy) == 0:
+            return []
+
+        boundaries = set()
+
+        # 方法1: 熵梯度检测（提高阈值，减少噪声）
+        entropy_gradient = np.gradient(byte_entropy)
+        entropy_threshold = np.std(entropy_gradient) * 1.5  # 从0.5提高到1.5
+
+        for i in range(1, len(entropy_gradient)):
+            if abs(entropy_gradient[i]) > entropy_threshold:
+                boundaries.add(i)
+
+        # 方法2: IoC突变检测（提高阈值）
+        if len(byte_ioc) > 1:
+            ioc_gradient = np.gradient(byte_ioc)
+            ioc_threshold = np.std(ioc_gradient) * 1.5  # 从0.5提高到1.5
+
+            for i in range(1, len(ioc_gradient)):
+                if abs(ioc_gradient[i]) > ioc_threshold:
+                    boundaries.add(i)
+
+        # 方法3: 只保留常见协议边界位置（减少噪声）
+        # 移除方法3中的所有边界，因为这会产生大量固定边界
+        # 只在熵/IoC检测的基础上添加极少数通用边界
+        essential_boundaries = [1, 2, 4, 8]  # 只保留最常见的边界
+        for size in essential_boundaries:
+            if size < len(byte_entropy):
+                # 只有当该位置附近有熵突变时才添加
+                if size in boundaries or (size-1) in boundaries or (size+1) in boundaries:
+                    boundaries.add(size)
+
+        # 方法4: 合并邻近边界（关键优化）
+        boundaries = self._merge_nearby_boundaries(sorted(list(boundaries)))
+
+        # 方法5: 限制边界数量（避免过拟合）
+        MAX_BOUNDARIES = 15  # 限制最多15个边界
+        if len(boundaries) > MAX_BOUNDARIES:
+            # 保留熵梯度最大的边界
+            boundary_scores = []
+            for b in boundaries:
+                if b < len(entropy_gradient):
+                    score = abs(entropy_gradient[b])
+                    boundary_scores.append((b, score))
+
+            boundary_scores.sort(key=lambda x: x[1], reverse=True)
+            boundaries = [b for b, _ in boundary_scores[:MAX_BOUNDARIES]]
+
+        return sorted(boundaries)
+
+    def _merge_nearby_boundaries(self, boundaries: List[int], min_distance: int = 2) -> List[int]:
+        """
+        合并邻近的边界（关键去噪方法）
+
+        策略：如果两个边界距离<min_distance，保留较小的那个
+        """
+        if not boundaries:
+            return []
+
+        merged = [boundaries[0]]
+
+        for i in range(1, len(boundaries)):
+            # 如果当前边界与上一个边界距离太近，跳过
+            if boundaries[i] - merged[-1] >= min_distance:
+                merged.append(boundaries[i])
+
+        return merged
+
+    def _infer_field_type_statistical(self, msg: bytes, start: int, end: int,
+                                      byte_entropy: np.ndarray) -> str:
+        """
+        基于统计特征推断字段类型
+
+        - 高熵 -> 'data' / 'identifier'
+        - 低熵 -> 'type' / 'command'
+        - 中熵 -> 'length' / 'count'
+        """
+        if start >= len(byte_entropy):
+            return 'unknown'
+
+        # 计算该字段的平均熵
+        field_entropy = np.mean(byte_entropy[start:min(end, len(byte_entropy))])
+
+        # 基于熵分类
+        if field_entropy > 5.0:
+            return 'data'  # 高熵，可能是数据
+        elif field_entropy > 3.0:
+            return 'identifier'  # 中高熵，可能是ID
+        elif field_entropy > 1.5:
+            return 'length'  # 中熵，可能是长度/计数
+        elif field_entropy > 0.5:
+            return 'type'  # 低熵，可能是类型/命令
+        else:
+            return 'constant'  # 极低熵，可能是常量
 
 
-class ImprovedLengthFieldDetector:
+class StatisticalLengthFieldDetector:
     """
-    改进的长度字段检测器
+    统计学习的长度字段检测器（协议无关）
+
+    算法：遍历所有可能的字段，检测其值是否与消息长度相关
     """
-    
+
     @staticmethod
-    def detect_length_fields(messages: List[bytes], 
+    def detect_length_fields(messages: List[bytes],
                             field_candidates: List[Any]) -> List[Tuple[int, int, float]]:
         """
-        检测长度字段
-        
+        检测长度字段（协议无关）
+
+        策略：
+        1. 对每个候选字段，提取其数值
+        2. 计算该值与消息长度的相关性
+        3. 测试多种长度关系：len(msg), len(msg)-offset, remaining_bytes
+
         返回: [(start, end, confidence), ...]
         """
         length_fields = []
-        
-        # Modbus特定：偏移4-5是长度字段
-        if len(messages) > 0 and len(messages[0]) >= 6:
-            # 验证偏移4-5是否符合长度字段特征
-            match_count = 0
-            for msg in messages[:min(100, len(messages))]:
-                if len(msg) >= 6:
-                    length_val = int.from_bytes(msg[4:6], 'big')
-                    actual_remaining = len(msg) - 6
-                    
-                    # 长度字段应该等于剩余字节数
-                    if length_val == actual_remaining:
-                        match_count += 1
-            
-            confidence = match_count / min(100, len(messages))
-            
-            if confidence > 0.7:
-                length_fields.append((4, 6, confidence))
-        
+
+        # 遍历所有小字段（1-4字节）作为候选
+        tested_positions = set()
+
+        for field in field_candidates:
+            if not (hasattr(field, 'start') and hasattr(field, 'end')):
+                continue
+
+            start, end = field.start, field.end
+            field_size = end - start
+
+            # 只测试1-4字节的字段
+            if field_size < 1 or field_size > 4:
+                continue
+
+            # 避免重复测试
+            if (start, end) in tested_positions:
+                continue
+            tested_positions.add((start, end))
+
+            # 测试多种长度关系
+            best_confidence = 0.0
+
+            for relationship in ['total_length', 'remaining_bytes', 'payload_size']:
+                confidence = StatisticalLengthFieldDetector._test_length_relationship(
+                    messages, start, end, relationship
+                )
+
+                if confidence > best_confidence:
+                    best_confidence = confidence
+
+            # 如果置信度高，认为是长度字段
+            if best_confidence > 0.7:
+                length_fields.append((start, end, best_confidence))
+
         return length_fields
 
+    @staticmethod
+    def _test_length_relationship(messages: List[bytes], start: int, end: int,
+                                  relationship: str) -> float:
+        """
+        测试字段值与消息长度的关系
 
-class ImprovedConstraintMiner:
+        relationship:
+        - 'total_length': field_value == len(msg)
+        - 'remaining_bytes': field_value == len(msg) - end
+        - 'payload_size': field_value == len(msg) - header_size
+        """
+        match_count = 0
+        total_count = 0
+
+        for msg in messages[:min(100, len(messages))]:
+            if end > len(msg):
+                continue
+
+            try:
+                # 提取字段值（大端序）
+                field_bytes = msg[start:end]
+                field_value = int.from_bytes(field_bytes, 'big')
+
+                # 根据关系类型计算期望值
+                if relationship == 'total_length':
+                    expected = len(msg)
+                elif relationship == 'remaining_bytes':
+                    expected = len(msg) - end
+                elif relationship == 'payload_size':
+                    # 尝试多个常见头部大小
+                    for header_size in [4, 6, 8, 12, 16]:
+                        if len(msg) > header_size:
+                            expected = len(msg) - header_size
+                            if field_value == expected:
+                                match_count += 1
+                                break
+                    total_count += 1
+                    continue
+                else:
+                    continue
+
+                if field_value == expected:
+                    match_count += 1
+
+                total_count += 1
+            except:
+                continue
+
+        return match_count / total_count if total_count > 0 else 0.0
+
+
+class StatisticalConstraintMiner:
     """
-    改进的约束挖掘器 - 专注于实际有用的约束
+    统计约束挖掘器（协议无关）
     """
-    
+
     @staticmethod
     def mine_length_constraints(messages: List[bytes],
                                length_fields: List[Tuple[int, int, float]]) -> List[Dict]:
         """
-        挖掘长度控制约束
-        
-        例如: Length_Field(4:6) = len(msg) - 6
+        挖掘长度控制约束（协议无关）
+
+        自动发现长度字段的计算公式
         """
         constraints = []
-        
+
         for start, end, conf in length_fields:
-            # 验证约束
-            valid_count = 0
-            total_count = 0
-            
-            for msg in messages[:min(100, len(messages))]:
-                if len(msg) >= end:
-                    length_val = int.from_bytes(msg[start:end], 'big')
-                    expected = len(msg) - 6  # Modbus: length = remaining after header
-                    
-                    if length_val == expected:
-                        valid_count += 1
-                    total_count += 1
-            
-            if total_count > 0 and valid_count / total_count > 0.8:
+            # 自动发现约束公式
+            constraint_formula = StatisticalConstraintMiner._discover_length_formula(
+                messages, start, end
+            )
+
+            if constraint_formula:
                 constraints.append({
                     'type': 'length_control',
                     'source_field': (start, end),
-                    'constraint': f'Field[{start}:{end}] = len(msg) - 6',
-                    'confidence': valid_count / total_count,
-                    'validated_samples': valid_count
+                    'constraint': constraint_formula['formula'],
+                    'confidence': constraint_formula['confidence'],
+                    'validated_samples': constraint_formula['matches']
                 })
-        
+
         return constraints
 
+    @staticmethod
+    def _discover_length_formula(messages: List[bytes], start: int, end: int) -> Optional[Dict]:
+        """
+        自动发现长度字段的计算公式
 
-class ImprovedSemPREExperimentRunner:
+        测试多种可能：
+        - field = len(msg)
+        - field = len(msg) - offset
+        - field = len(msg) - start - field_size
+        """
+        best_formula = None
+        best_confidence = 0.0
+
+        formulas_to_test = [
+            ('len(msg)', lambda msg, s, e: len(msg)),
+            (f'len(msg) - {end}', lambda msg, s, e: len(msg) - e),
+            (f'len(msg) - {start}', lambda msg, s, e: len(msg) - s),
+            (f'len(msg) - {start} - {end - start}', lambda msg, s, e: len(msg) - s - (e - s)),
+        ]
+
+        for formula_str, formula_fn in formulas_to_test:
+            match_count = 0
+            total_count = 0
+
+            for msg in messages[:min(100, len(messages))]:
+                if end > len(msg):
+                    continue
+
+                try:
+                    field_value = int.from_bytes(msg[start:end], 'big')
+                    expected = formula_fn(msg, start, end)
+
+                    if field_value == expected:
+                        match_count += 1
+                    total_count += 1
+                except:
+                    continue
+
+            confidence = match_count / total_count if total_count > 0 else 0.0
+
+            if confidence > best_confidence:
+                best_confidence = confidence
+                best_formula = {
+                    'formula': f'Field[{start}:{end}] = {formula_str}',
+                    'confidence': confidence,
+                    'matches': match_count
+                }
+
+        return best_formula if best_confidence > 0.7 else None
+
+
+class StatisticalSemPREExperimentRunner:
     """
-    改进的 SemPRE 实验运行器
+    纯统计学习的 SemPRE 实验运行器（Protocol-Agnostic）
+
+    关键特性：
+    - 无Modbus特定知识
+    - 无硬编码字段位置
+    - 纯基于统计特征的学习
     """
-    
-    def __init__(self, output_dir: str, protocol_name: str = 'modbus'):
+
+    def __init__(self, output_dir: str, protocol_name: str = 'unknown'):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         self.protocol_name = protocol_name
         self.logger = self._setup_logger()
-        
-        # 改进的检测器
-        self.field_detector = ImprovedFieldDetector(protocol_name, self.logger)
-        self.length_detector = ImprovedLengthFieldDetector()
-        self.constraint_miner = ImprovedConstraintMiner()
-        
+
+        # 统计学习的检测器（协议无关）
+        self.field_detector = StatisticalFieldDetector(protocol_name, self.logger)
+        self.length_detector = StatisticalLengthFieldDetector()
+        self.constraint_miner = StatisticalConstraintMiner()
+
         self.results = {
             'exp1_format_inference': {},
             'exp2_constraint_discovery': {},
@@ -318,10 +566,10 @@ class ImprovedSemPREExperimentRunner:
     
     def _setup_logger(self) -> logging.Logger:
         """配置日志"""
-        logger = logging.getLogger('ImprovedSemPRE')
+        logger = logging.getLogger('StatisticalSemPRE')
         logger.setLevel(logging.INFO)
-        
-        log_file = self.output_dir / 'improved_experiment.log'
+
+        log_file = self.output_dir / 'statistical_experiment.log'
         fh = logging.FileHandler(log_file, encoding='utf-8')
         fh.setLevel(logging.INFO)
         
@@ -340,9 +588,9 @@ class ImprovedSemPREExperimentRunner:
         return logger
     
     def load_data(self, csv_path: str, ground_truth_path: str) -> Tuple[List[bytes], Dict]:
-        """加载数据"""
+        """加载数据（仅用于评估，不影响学习过程）"""
         self.logger.info("=" * 70)
-        self.logger.info("加载数据（改进版）")
+        self.logger.info("加载数据（纯统计学习版）")
         self.logger.info("=" * 70)
         
         # 加载CSV
@@ -372,22 +620,15 @@ class ImprovedSemPREExperimentRunner:
                         msg_bytes = bytes.fromhex(hex_str)
                         messages.append(msg_bytes)
                         
-                        # 提取边界
+                        # 提取边界（仅从CSV）
                         if 'Boundaries' in row and row['Boundaries']:
                             boundaries_str = row['Boundaries'].strip('"').strip("'")
                             boundaries = [int(b) for b in boundaries_str.split(',')]
                             boundaries_list.append(boundaries)
                         else:
-                            # 如果没有边界，使用协议知识生成
-                            if len(msg_bytes) >= 8:
-                                func_code = msg_bytes[7]
-                                kb = ProtocolKnowledgeBase()
-                                boundaries = kb.get_modbus_boundaries_by_function(
-                                    func_code, len(msg_bytes)
-                                )
-                                boundaries_list.append(boundaries)
-                            else:
-                                boundaries_list.append([])
+                            # 如果CSV中没有边界，则记录为空
+                            # 注意：不使用任何硬编码规则生成边界
+                            boundaries_list.append([])
                     except (ValueError, Exception) as e:
                         continue
         
@@ -427,45 +668,45 @@ class ImprovedSemPREExperimentRunner:
         return ground_truth
     
     def run_all_experiments(self, messages: List[bytes], ground_truth: Dict) -> None:
-        """运行所有实验（改进版）"""
+        """运行所有实验（纯统计学习版）"""
         self.logger.info("\n" + "=" * 70)
-        self.logger.info("改进版 SemPRE: Running All Experiments")
+        self.logger.info("SemPRE: Protocol-Agnostic Statistical Learning")
         self.logger.info("=" * 70)
-        
-        # 实验1: 格式推理准确率（改进）
-        self.logger.info("\n### Experiment 1: Format Inference (Improved)")
-        self.results['exp1_format_inference'] = self.experiment1_improved(
+
+        # 实验1: 格式推理准确率（纯统计）
+        self.logger.info("\n### Experiment 1: Statistical Format Inference")
+        self.results['exp1_format_inference'] = self.experiment1_statistical(
             messages, ground_truth
         )
-        
-        # 实验2: 语义约束发现（改进）
-        self.logger.info("\n### Experiment 2: Constraint Discovery (Improved)")
-        self.results['exp2_constraint_discovery'] = self.experiment2_improved(
+
+        # 实验2: 语义约束发现（协议无关）
+        self.logger.info("\n### Experiment 2: Protocol-Agnostic Constraint Discovery")
+        self.results['exp2_constraint_discovery'] = self.experiment2_statistical(
             messages, ground_truth
         )
-        
-        # 实验3: 零样本功能推理
-        self.logger.info("\n### Experiment 3: Zero-Shot Function Inference")
+
+        # 实验3: 零样本功能推理（无位置假设）
+        self.logger.info("\n### Experiment 3: Zero-Shot Function Inference (No Position Assumptions)")
         self.results['exp3_function_inference'] = self.experiment3_function_inference(
             messages, ground_truth
         )
-        
+
         # 实验4: 数据效率
         self.logger.info("\n### Experiment 4: Data Efficiency")
         self.results['exp4_data_efficiency'] = self.experiment4_data_efficiency(
             messages, ground_truth
         )
-        
+
         # 保存结果
         self._save_all_results()
     
-    def experiment1_improved(self, messages: List[bytes], ground_truth: Dict) -> Dict[str, Any]:
+    def experiment1_statistical(self, messages: List[bytes], ground_truth: Dict) -> Dict[str, Any]:
         """
-        实验1改进版：使用协议知识的字段边界检测
+        实验1：纯统计的字段边界检测（无协议知识）
         """
-        self.logger.info("使用协议感知检测...")
-        
-        # 使用改进的检测器
+        self.logger.info("使用纯统计方法（熵+IoC）...")
+
+        # 使用统计检测器
         detected_fields, metadata = self.field_detector.detect_fields(messages)
         detected_boundaries_per_msg = metadata['boundaries_per_message']
         
@@ -520,9 +761,9 @@ class ImprovedSemPREExperimentRunner:
         
         return metrics
     
-    def experiment2_improved(self, messages: List[bytes], ground_truth: Dict) -> Dict[str, Any]:
+    def experiment2_statistical(self, messages: List[bytes], ground_truth: Dict) -> Dict[str, Any]:
         """
-        实验2改进版：专注于实际约束发现（使用优化版SDG）
+        实验2：协议无关的约束发现
         """
         # 检测长度字段
         detected_fields, _ = self.field_detector.detect_fields(messages)
@@ -534,17 +775,28 @@ class ImprovedSemPREExperimentRunner:
         length_constraints = self.constraint_miner.mine_length_constraints(messages, length_fields)
         
         self.logger.info(f"✓ 发现 {len(length_constraints)} 个长度控制约束")
-        
-        # 构建SDG（使用优化版，现在应该很快）
-        self.logger.info("开始构建语义依赖图...")
-        sdg = SemanticDependencyGraph(logger=self.logger)
-        sampled = messages[:min(200, len(messages))]
-        stats = sdg.build_from_messages(sampled, detected_fields)
-        
-        # 导出Graphviz
-        dot_path = self.output_dir / f"{self.protocol_name}_improved_sdg.dot"
-        sdg.export_graphviz(str(dot_path))
-        self.logger.info(f"✓ SDG已导出到: {dot_path}")
+
+        # SDG构建（可选 - 耗时较长，可跳过）
+        # 注意：SDG构建对核心评估指标（F1/Perfect Score）无影响
+        ENABLE_SDG = False  # 设为False可大幅提速
+
+        if ENABLE_SDG:
+            self.logger.info("开始构建语义依赖图...")
+            sdg = SemanticDependencyGraph(logger=self.logger)
+            sampled = messages[:min(100, len(messages))]  # 减少样本数
+            stats = sdg.build_from_messages(sampled, detected_fields)
+
+            # 导出Graphviz
+            dot_path = self.output_dir / f"{self.protocol_name}_improved_sdg.dot"
+            sdg.export_graphviz(str(dot_path))
+            self.logger.info(f"✓ SDG已导出到: {dot_path}")
+        else:
+            self.logger.info("跳过SDG构建（提速优化）")
+            stats = {
+                'arithmetic_constraints': 0,
+                'logical_constraints': 0,
+                'edge_count': 0
+            }
         
         results = {
             'length_fields_detected': len(length_fields),
@@ -634,36 +886,97 @@ class ImprovedSemPREExperimentRunner:
         return {'ratios': ratios, 'results': results}
     
     def _extract_function_profiles(self, messages: List[bytes]) -> List[Any]:
-        """提取功能码统计"""
+        """
+        提取功能码统计（协议无关）
+
+        策略：尝试所有可能的字节位置作为"类型字段"候选
+        基于低熵特征识别类型字段
+        """
         from dataclasses import dataclass
-        
+
         @dataclass
         class FunctionProfile:
             code: int
             count: int
             name: str
             avg_length: float
-        
+            byte_position: int  # 该功能码所在的字节位置
+
+        # 1. 找到最可能的"类型字段"位置（基于熵分析）
+        type_field_position = self._find_type_field_position(messages)
+
+        self.logger.info(f"  推断类型字段位置: offset {type_field_position}")
+
+        # 2. 基于该位置提取功能码
         func_stats = {}
         for msg in messages:
-            if len(msg) > 7:  # Modbus功能码在偏移7
-                func_code = msg[7]
+            if len(msg) > type_field_position:
+                func_code = msg[type_field_position]
                 if func_code not in func_stats:
                     func_stats[func_code] = {'count': 0, 'lengths': []}
                 func_stats[func_code]['count'] += 1
                 func_stats[func_code]['lengths'].append(len(msg))
-        
+
         profiles = []
         for code, stats in func_stats.items():
             profile = FunctionProfile(
                 code=code,
                 count=stats['count'],
-                name=f'Unknown_0x{code:02X}',
-                avg_length=np.mean(stats['lengths'])
+                name=f'Type_0x{code:02X}',
+                avg_length=np.mean(stats['lengths']),
+                byte_position=type_field_position
             )
             profiles.append(profile)
-        
+
         return profiles
+
+    def _find_type_field_position(self, messages: List[bytes]) -> int:
+        """
+        找到最可能的类型/命令字段位置（协议无关）
+
+        特征：
+        1. 低熵（值的种类少）
+        2. 跨消息一致（所有消息都有该字节）
+        3. 不是常量（至少有几个不同值）
+        """
+        if not messages:
+            return 0
+
+        max_len = max(len(msg) for msg in messages)
+        best_position = 0
+        best_score = float('inf')
+
+        for pos in range(min(32, max_len)):  # 只检查前32字节
+            values = []
+            for msg in messages:
+                if pos < len(msg):
+                    values.append(msg[pos])
+
+            if len(values) < len(messages) * 0.9:  # 至少90%的消息有该字节
+                continue
+
+            # 计算该位置的"类型字段分数"
+            unique_count = len(set(values))
+
+            # 理想的类型字段：3-20个不同值
+            if 3 <= unique_count <= 20:
+                # 计算熵
+                counter = Counter(values)
+                total = len(values)
+                entropy = 0.0
+                for count in counter.values():
+                    p = count / total
+                    if p > 0:
+                        entropy -= p * np.log2(p)
+
+                # 低熵的字段更可能是类型字段
+                score = entropy
+
+                if score < best_score:
+                    best_score = score
+                    best_position = pos
+
+        return best_position
     
     def _save_all_results(self) -> None:
         """保存所有结果"""
@@ -703,40 +1016,42 @@ class ImprovedSemPREExperimentRunner:
         self._print_improvement_summary()
     
     def _print_improvement_summary(self) -> None:
-        """打印改进总结"""
+        """打印实验总结"""
         self.logger.info("\n" + "=" * 70)
-        self.logger.info("改进总结")
+        self.logger.info("实验总结（纯统计学习）")
         self.logger.info("=" * 70)
-        
+
         exp1 = self.results['exp1_format_inference']
         exp2 = self.results['exp2_constraint_discovery']
-        
-        self.logger.info("\n 关键改进:")
-        self.logger.info(f"  ✓ Perfect Score: {exp1.get('perfect_score', 0):.4f} (目标 > 0.8)")
-        self.logger.info(f"  ✓ F1 Score: {exp1.get('f1_score', 0):.4f} (目标 > 0.85)")
-        self.logger.info(f"  ✓ Precision: {exp1.get('precision', 0):.4f} (目标 > 0.85)")
-        self.logger.info(f"  ✓ 长度约束: {exp2.get('length_constraints', 0)} 个")
-        self.logger.info(f"  ✓ 检测方法: {exp1.get('detection_method', 'unknown')}")
-        
-        # self.logger.info("\n与原始版本对比:")
-        # self.logger.info("  原始: F1=0.67, Perfect=0.00, 长度约束=0")
-        # self.logger.info(f"  改进: F1={exp1.get('f1_score', 0):.2f}, Perfect={exp1.get('perfect_score', 0):.2f}, 长度约束={exp2.get('length_constraints', 0)}")
+
+        self.logger.info("\n 关键指标:")
+        self.logger.info(f"  • F1 Score: {exp1.get('f1_score', 0):.4f}")
+        self.logger.info(f"  • Perfect Score: {exp1.get('perfect_score', 0):.4f}")
+        self.logger.info(f"  • Precision: {exp1.get('precision', 0):.4f}")
+        self.logger.info(f"  • Recall: {exp1.get('recall', 0):.4f}")
+        self.logger.info(f"  • 长度约束: {exp2.get('length_constraints', 0)} 个")
+        self.logger.info(f"  • 检测方法: {exp1.get('detection_method', 'unknown')}")
+
+        self.logger.info("\n 注意：")
+        self.logger.info("  - 本版本使用纯统计学习，无Modbus特定知识")
+        self.logger.info("  - 分数反映算法的真实学习能力，而非规则匹配")
+        self.logger.info("  - 评估重点：泛化能力 > 单一协议准确率")
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Improved SemPRE Experiment Runner'
+        description='SemPRE: Protocol-Agnostic Statistical Learning Experiment Runner'
     )
-    
+
     parser.add_argument('--csv', required=True, help='输入CSV文件')
     parser.add_argument('--ground-truth', required=True, help='Ground Truth JSON文件')
-    parser.add_argument('--output-dir', default='./output/improved', help='输出目录')
-    parser.add_argument('--protocol', default='modbus', help='协议名称')
-    
+    parser.add_argument('--output-dir', default='./output/statistical', help='输出目录')
+    parser.add_argument('--protocol', default='unknown', help='协议名称（仅用于标记，不影响算法）')
+
     args = parser.parse_args()
-    
-    # 创建改进版运行器
-    runner = ImprovedSemPREExperimentRunner(args.output_dir, args.protocol)
+
+    # 创建纯统计学习运行器
+    runner = StatisticalSemPREExperimentRunner(args.output_dir, args.protocol)
     
     # 加载数据
     messages, ground_truth = runner.load_data(args.csv, args.ground_truth)

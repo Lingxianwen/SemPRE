@@ -176,96 +176,103 @@ class OptimizedSemanticDependencyGraph:
                                               field_candidates: List[Any]) -> List[SDGEdge]:
         """
         优化的算术约束挖掘
-        
+
         性能优化策略：
         1. 智能过滤 - 只检测数值字段对
         2. 大小限制 - 只检测小字段（1-4字节）
         3. 熵过滤 - 跳过低熵（常量）字段
         4. 早期终止 - 快速相关性检查
+        5. 限制候选数量 - 最多检测前20个字段
         """
         edges = []
-        
+
         # 步骤1: 过滤出候选字段（只保留可能参与算术关系的字段）
         numeric_fields = []
         for field in field_candidates:
             if not (hasattr(field, 'start') and hasattr(field, 'end')):
                 continue
-            
+
             field_size = field.end - field.start
-            
+
             # 只检测1-4字节的字段（可能的数值字段）
             if 1 <= field_size <= 4:
                 # 计算熵
                 entropy = self._calculate_field_entropy(messages, field.start, field.end)
-                
+
                 # 跳过低熵字段（可能是常量）
                 if entropy > 0.5:  # 阈值：至少有一些变化
                     numeric_fields.append(field)
-        
+
+        # 步骤1.5: 限制候选字段数量（避免组合爆炸）
+        MAX_NUMERIC_FIELDS = 20
+        if len(numeric_fields) > MAX_NUMERIC_FIELDS:
+            self.logger.info(f"  候选字段过多 ({len(numeric_fields)})，采样前 {MAX_NUMERIC_FIELDS} 个")
+            numeric_fields = numeric_fields[:MAX_NUMERIC_FIELDS]
+
         self.logger.info(f"  算术约束候选字段: {len(numeric_fields)} / {len(field_candidates)}")
-        
+
         # 步骤2: 采样消息（减少计算量）
-        sampled_messages = messages[:min(100, len(messages))]
-        
+        sampled_messages = messages[:min(50, len(messages))]
+
         # 步骤3: 智能配对检测（只检测可能相关的字段对）
         checked_pairs = 0
-        max_pairs = min(1000, len(numeric_fields) * 10)  # 限制最大检查数
-        
+        max_pairs = min(200, len(numeric_fields) * len(numeric_fields))  # 更严格的限制
+
         for i, field_a in enumerate(numeric_fields):
             for j, field_b in enumerate(numeric_fields):
                 if i >= j:
                     continue
-                
+
                 checked_pairs += 1
                 if checked_pairs > max_pairs:
                     self.logger.info(f"  达到最大检查对数限制: {max_pairs}")
                     break
-                
+
                 # 快速相关性检查
                 correlation = self._quick_correlation_check(
                     sampled_messages, field_a, field_b
                 )
-                
+
                 # 只对高相关性的字段对进行详细分析
-                if correlation > 0.7:
+                if correlation > 0.85:  # 提高阈值，减少误报
                     edge = self._analyze_field_pair(
                         sampled_messages, field_a, field_b, i, j
                     )
                     if edge:
                         edges.append(edge)
-            
+
             if checked_pairs > max_pairs:
                 break
-        
+
         self.logger.info(f"  检查了 {checked_pairs} 个字段对")
-        
+
         return edges
 
     def _quick_correlation_check(self, messages: List[bytes],
                                  field_a: Any, field_b: Any) -> float:
         """
         快速相关性检查（早期终止策略）
-        
+
         返回皮尔逊相关系数的绝对值
         """
         values_a = []
         values_b = []
-        
-        for msg in messages[:50]:  # 只检查前50条
+
+        for msg in messages[:30]:  # 只检查前30条（减少计算）
             try:
                 if field_a.end <= len(msg) and field_b.end <= len(msg):
                     val_a = self._extract_numeric_value(msg, field_a.start, field_a.end)
                     val_b = self._extract_numeric_value(msg, field_b.start, field_b.end)
-                    
+
                     if val_a is not None and val_b is not None:
                         values_a.append(val_a)
                         values_b.append(val_b)
             except:
                 continue
-        
-        if len(values_a) < 5:
+
+        if len(values_a) < 3:  # 降低最小样本数
             return 0.0
-        
+
         # 快速相关性计算
         try:
             correlation = np.corrcoef(values_a, values_b)[0, 1]
