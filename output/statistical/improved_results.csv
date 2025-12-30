@@ -1,8 +1,8 @@
 Experiment,Metric,Value
-Format Inference,F1 Score,0.4142
-Format Inference,Precision,0.6344
-Format Inference,Recall,0.3154
+Format Inference,F1 Score,0.3290
+Format Inference,Precision,0.3301
+Format Inference,Recall,0.3326
 Format Inference,Perfect Score,0.0000
-Constraint Discovery,Length Constraints,0
+Constraint Discovery,Length Constraints,1
 Constraint Discovery,Arithmetic,0
-Constraint Discovery,Total,0
+Constraint Discovery,Total,1

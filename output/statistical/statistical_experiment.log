@@ -293,3 +293,525 @@ Inferred 14 unknown function codes
 2025-12-29 20:20:44,026 - StatisticalSemPRE - INFO -   - 本版本使用纯统计学习，无Modbus特定知识
 2025-12-29 20:20:44,026 - StatisticalSemPRE - INFO -   - 分数反映算法的真实学习能力，而非规则匹配
 2025-12-29 20:20:44,026 - StatisticalSemPRE - INFO -   - 评估重点：泛化能力 > 单一协议准确率
+2025-12-29 20:43:55,976 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:43:55,976 - StatisticalSemPRE - INFO - 加载数据（纯统计学习版）
+2025-12-29 20:43:55,976 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:43:55,984 - StatisticalSemPRE - INFO - ✓ 从CSV加载了 1344 条消息
+2025-12-29 20:43:55,984 - StatisticalSemPRE - INFO -   ✓ 从JSON加载Ground Truth: 6 项
+2025-12-29 20:43:55,984 - StatisticalSemPRE - INFO - ✓ 加载了Ground Truth
+2025-12-29 20:43:55,984 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 20:43:55,984 - StatisticalSemPRE - INFO - SemPRE: Protocol-Agnostic Statistical Learning
+2025-12-29 20:43:55,984 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:43:55,984 - StatisticalSemPRE - INFO - 
+### Experiment 1: Statistical Format Inference
+2025-12-29 20:43:55,985 - StatisticalSemPRE - INFO - 使用纯统计方法（熵+IoC）...
+2025-12-29 20:43:56,006 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 20:43:56,006 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:43:56,008 - StatisticalSemPRE - INFO -   边界候选: [1, 4, 7, 29, 104, 106, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 20:43:56,039 - StatisticalSemPRE - INFO - ✓ F1 Score: 0.4142
+2025-12-29 20:43:56,039 - StatisticalSemPRE - INFO - ✓ Perfect Score: 0.0000
+2025-12-29 20:43:56,039 - StatisticalSemPRE - INFO - ✓ Precision: 0.6344
+2025-12-29 20:43:56,039 - StatisticalSemPRE - INFO - ✓ Recall: 0.3154
+2025-12-29 20:43:56,039 - StatisticalSemPRE - INFO - ✓ Perfect Matches: 0/1344
+2025-12-29 20:43:56,039 - StatisticalSemPRE - INFO - 
+### Experiment 2: Protocol-Agnostic Constraint Discovery
+2025-12-29 20:43:56,060 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 20:43:56,060 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:43:56,062 - StatisticalSemPRE - INFO -   边界候选: [1, 4, 7, 29, 104, 106, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 20:43:56,084 - StatisticalSemPRE - INFO - ✓ 检测到 0 个长度字段
+2025-12-29 20:43:56,084 - StatisticalSemPRE - INFO - ✓ 发现 0 个长度控制约束
+2025-12-29 20:43:56,084 - StatisticalSemPRE - INFO - 跳过SDG构建（提速优化）
+2025-12-29 20:43:56,084 - StatisticalSemPRE - INFO - ✓ 总约束数: 0
+2025-12-29 20:43:56,084 - StatisticalSemPRE - INFO - ✓ 算术约束: 0
+2025-12-29 20:43:56,084 - StatisticalSemPRE - INFO - 
+### Experiment 3: Zero-Shot Function Inference (No Position Assumptions)
+2025-12-29 20:43:56,087 - StatisticalSemPRE - INFO -   推断类型字段位置: offset 10
+2025-12-29 20:43:56,087 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:43:56,087 - StatisticalSemPRE - INFO - SemPRE: Zero-Shot Function Semantic Inference
+2025-12-29 20:43:56,087 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:43:56,089 - StatisticalSemPRE - INFO - ✓ FC 0x00 -> WRITE (conf=0.80)
+2025-12-29 20:43:56,089 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,16B) | FIELDS(5) | SIZE(21B)
+2025-12-29 20:43:56,089 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO - ✓ FC 0x04 -> Filesystem_Op (conf=0.47)
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO - ✓ FC 0x4F -> WRITE (conf=0.80)
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,23B) | FIELDS(7) | SIZE(30B)
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO - ✓ FC 0x30 -> Filesystem_Op (conf=0.70)
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,73B) | FIELDS(22) | SIZE(89B)
+2025-12-29 20:43:56,090 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 73B; Size in range [50, 1000]: 89B
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO - ✓ FC 0x32 -> WRITE (conf=0.80)
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(count_dependent,212B) | FIELDS(57) | SIZE(228B)
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO - ✓ FC 0x05 -> Filesystem_Op (conf=0.70)
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,223B) | FIELDS(59) | SIZE(239B)
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 223B; Size in range [50, 1000]: 239B
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO - ✓ FC 0xA3 -> READ (conf=0.60)
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 20:43:56,092 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO - ✓ FC 0x83 -> READ (conf=0.60)
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO - ✓ FC 0x01 -> Filesystem_Op (conf=0.47)
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,13B) | FIELDS(4) | SIZE(17B)
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 13B
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO - ✓ FC 0xC2 -> Filesystem_Op (conf=0.47)
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 20:43:56,093 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO - ✓ FC 0x03 -> READ (conf=0.60)
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,9B) | FIELDS(3) | SIZE(12B)
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO - ✓ FC 0x0F -> Filesystem_Op (conf=0.47)
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO - ✓ FC 0x1E -> WRITE (conf=0.80)
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,205B) | FIELDS(55) | SIZE(221B)
+2025-12-29 20:43:56,095 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,096 - StatisticalSemPRE - INFO - ✓ FC 0xFF -> READ (conf=0.60)
+2025-12-29 20:43:56,096 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,9B) | FIELDS(3) | SIZE(12B)
+2025-12-29 20:43:56,096 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 20:43:56,096 - StatisticalSemPRE - INFO - 
+Inferred 14 unknown function codes
+2025-12-29 20:43:56,096 - StatisticalSemPRE - INFO - 
+### Experiment 4: Data Efficiency
+2025-12-29 20:43:56,096 - StatisticalSemPRE - INFO - 
+  Testing with 10% data (134 messages)
+2025-12-29 20:43:56,099 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 5.82
+2025-12-29 20:43:56,099 - StatisticalSemPRE - INFO -   重合指数范围: 0.000 - 1.000
+2025-12-29 20:43:56,101 - StatisticalSemPRE - INFO -   边界候选: [1, 4, 7, 26, 29, 36, 38, 40, 52, 59, 93, 115, 208, 213, 215]
+2025-12-29 20:43:56,104 - StatisticalSemPRE - INFO -   F1 Score: 0.3922
+2025-12-29 20:43:56,104 - StatisticalSemPRE - INFO - 
+  Testing with 30% data (403 messages)
+2025-12-29 20:43:56,112 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.18
+2025-12-29 20:43:56,112 - StatisticalSemPRE - INFO -   重合指数范围: 0.005 - 1.000
+2025-12-29 20:43:56,113 - StatisticalSemPRE - INFO -   边界候选: [1, 4, 7, 9, 11, 26, 29, 93, 113, 115, 151, 164, 208, 213, 215]
+2025-12-29 20:43:56,121 - StatisticalSemPRE - INFO -   F1 Score: 0.5561
+2025-12-29 20:43:56,122 - StatisticalSemPRE - INFO - 
+  Testing with 50% data (672 messages)
+2025-12-29 20:43:56,133 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.62
+2025-12-29 20:43:56,133 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:43:56,134 - StatisticalSemPRE - INFO -   边界候选: [1, 4, 7, 29, 104, 106, 113, 115, 123, 148, 151, 164, 205, 208, 215]
+2025-12-29 20:43:56,145 - StatisticalSemPRE - INFO -   F1 Score: 0.4115
+2025-12-29 20:43:56,145 - StatisticalSemPRE - INFO - 
+  Testing with 100% data (1344 messages)
+2025-12-29 20:43:56,166 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 20:43:56,166 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:43:56,166 - StatisticalSemPRE - INFO -   边界候选: [1, 4, 7, 29, 104, 106, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 20:43:56,187 - StatisticalSemPRE - INFO -   F1 Score: 0.4142
+2025-12-29 20:43:56,187 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 20:43:56,187 - StatisticalSemPRE - INFO - 保存结果
+2025-12-29 20:43:56,187 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:43:56,189 - StatisticalSemPRE - INFO - ✓ Saved JSON: output\statistical\improved_results.json
+2025-12-29 20:43:56,189 - StatisticalSemPRE - INFO - ✓ Saved CSV: output\statistical\improved_results.csv
+2025-12-29 20:43:56,189 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 20:43:56,189 - StatisticalSemPRE - INFO - 实验总结（纯统计学习）
+2025-12-29 20:43:56,189 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:43:56,189 - StatisticalSemPRE - INFO - 
+ 关键指标:
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   • F1 Score: 0.4142
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   • Perfect Score: 0.0000
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   • Precision: 0.6344
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   • Recall: 0.3154
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   • 长度约束: 0 个
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   • 检测方法: statistical
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO - 
+ 注意：
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   - 本版本使用纯统计学习，无Modbus特定知识
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   - 分数反映算法的真实学习能力，而非规则匹配
+2025-12-29 20:43:56,190 - StatisticalSemPRE - INFO -   - 评估重点：泛化能力 > 单一协议准确率
+2025-12-29 20:58:13,991 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:58:13,991 - StatisticalSemPRE - INFO - 加载数据（纯统计学习版）
+2025-12-29 20:58:13,991 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:58:13,998 - StatisticalSemPRE - INFO - ✓ 从CSV加载了 1344 条消息
+2025-12-29 20:58:14,000 - StatisticalSemPRE - INFO -   ✓ 从JSON加载Ground Truth: 6 项
+2025-12-29 20:58:14,000 - StatisticalSemPRE - INFO - ✓ 加载了Ground Truth
+2025-12-29 20:58:14,000 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 20:58:14,000 - StatisticalSemPRE - INFO - SemPRE: Protocol-Agnostic Statistical Learning
+2025-12-29 20:58:14,000 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:58:14,000 - StatisticalSemPRE - INFO - 
+### Experiment 1: Statistical Format Inference
+2025-12-29 20:58:14,000 - StatisticalSemPRE - INFO - 使用纯统计方法（熵+IoC）...
+2025-12-29 20:58:14,021 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 20:58:14,022 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:58:14,042 - StatisticalSemPRE - INFO -   MI边界检测: 20 个
+2025-12-29 20:58:14,044 - StatisticalSemPRE - INFO -   TLV边界检测: 24 个
+2025-12-29 20:58:14,045 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 20:58:14,045 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 53, 104, 113, 115, 123, 151, 164, 205, 208, 215]
+2025-12-29 20:58:14,074 - StatisticalSemPRE - INFO - ✓ F1 Score: 0.1870
+2025-12-29 20:58:14,075 - StatisticalSemPRE - INFO - ✓ Perfect Score: 0.0000
+2025-12-29 20:58:14,075 - StatisticalSemPRE - INFO - ✓ Precision: 0.2382
+2025-12-29 20:58:14,075 - StatisticalSemPRE - INFO - ✓ Recall: 0.1577
+2025-12-29 20:58:14,075 - StatisticalSemPRE - INFO - ✓ Perfect Matches: 0/1344
+2025-12-29 20:58:14,075 - StatisticalSemPRE - INFO - 
+### Experiment 2: Protocol-Agnostic Constraint Discovery
+2025-12-29 20:58:14,097 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 20:58:14,097 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:58:14,116 - StatisticalSemPRE - INFO -   MI边界检测: 20 个
+2025-12-29 20:58:14,116 - StatisticalSemPRE - INFO -   TLV边界检测: 24 个
+2025-12-29 20:58:14,119 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 20:58:14,119 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 53, 104, 113, 115, 123, 151, 164, 205, 208, 215]
+2025-12-29 20:58:59,407 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:58:59,407 - StatisticalSemPRE - INFO - 加载数据（纯统计学习版）
+2025-12-29 20:58:59,407 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:58:59,415 - StatisticalSemPRE - INFO - ✓ 从CSV加载了 1344 条消息
+2025-12-29 20:58:59,415 - StatisticalSemPRE - INFO -   ✓ 从JSON加载Ground Truth: 6 项
+2025-12-29 20:58:59,416 - StatisticalSemPRE - INFO - ✓ 加载了Ground Truth
+2025-12-29 20:58:59,416 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 20:58:59,416 - StatisticalSemPRE - INFO - SemPRE: Protocol-Agnostic Statistical Learning
+2025-12-29 20:58:59,416 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 20:58:59,416 - StatisticalSemPRE - INFO - 
+### Experiment 1: Statistical Format Inference
+2025-12-29 20:58:59,416 - StatisticalSemPRE - INFO - 使用纯统计方法（熵+IoC）...
+2025-12-29 20:58:59,437 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 20:58:59,437 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:58:59,458 - StatisticalSemPRE - INFO -   MI边界检测: 20 个
+2025-12-29 20:58:59,460 - StatisticalSemPRE - INFO -   TLV边界检测: 24 个
+2025-12-29 20:58:59,461 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 20:58:59,461 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 53, 104, 113, 115, 123, 151, 164, 205, 208, 215]
+2025-12-29 20:58:59,491 - StatisticalSemPRE - INFO - ✓ F1 Score: 0.1870
+2025-12-29 20:58:59,491 - StatisticalSemPRE - INFO - ✓ Perfect Score: 0.0000
+2025-12-29 20:58:59,491 - StatisticalSemPRE - INFO - ✓ Precision: 0.2382
+2025-12-29 20:58:59,493 - StatisticalSemPRE - INFO - ✓ Recall: 0.1577
+2025-12-29 20:58:59,493 - StatisticalSemPRE - INFO - ✓ Perfect Matches: 0/1344
+2025-12-29 20:58:59,493 - StatisticalSemPRE - INFO - 
+### Experiment 2: Protocol-Agnostic Constraint Discovery
+2025-12-29 20:58:59,515 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 20:58:59,515 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 20:58:59,536 - StatisticalSemPRE - INFO -   MI边界检测: 20 个
+2025-12-29 20:58:59,536 - StatisticalSemPRE - INFO -   TLV边界检测: 24 个
+2025-12-29 20:58:59,538 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 20:58:59,539 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 53, 104, 113, 115, 123, 151, 164, 205, 208, 215]
+2025-12-29 21:02:38,598 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:02:38,598 - StatisticalSemPRE - INFO - 加载数据（纯统计学习版）
+2025-12-29 21:02:38,598 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:02:38,605 - StatisticalSemPRE - INFO - ✓ 从CSV加载了 1344 条消息
+2025-12-29 21:02:38,605 - StatisticalSemPRE - INFO -   ✓ 从JSON加载Ground Truth: 6 项
+2025-12-29 21:02:38,605 - StatisticalSemPRE - INFO - ✓ 加载了Ground Truth
+2025-12-29 21:02:38,605 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 21:02:38,607 - StatisticalSemPRE - INFO - SemPRE: Protocol-Agnostic Statistical Learning
+2025-12-29 21:02:38,607 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:02:38,607 - StatisticalSemPRE - INFO - 
+### Experiment 1: Statistical Format Inference
+2025-12-29 21:02:38,607 - StatisticalSemPRE - INFO - 使用纯统计方法（熵+IoC）...
+2025-12-29 21:02:38,627 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:02:38,627 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:02:38,630 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:02:38,630 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:02:38,632 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:02:38,632 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 104, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:02:38,659 - StatisticalSemPRE - INFO - ✓ F1 Score: 0.1876
+2025-12-29 21:02:38,659 - StatisticalSemPRE - INFO - ✓ Perfect Score: 0.0000
+2025-12-29 21:02:38,659 - StatisticalSemPRE - INFO - ✓ Precision: 0.2395
+2025-12-29 21:02:38,661 - StatisticalSemPRE - INFO - ✓ Recall: 0.1577
+2025-12-29 21:02:38,661 - StatisticalSemPRE - INFO - ✓ Perfect Matches: 0/1344
+2025-12-29 21:02:38,661 - StatisticalSemPRE - INFO - 
+### Experiment 2: Protocol-Agnostic Constraint Discovery
+2025-12-29 21:02:38,680 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:02:38,682 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:02:38,683 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:02:38,683 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:02:38,686 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:02:38,686 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 104, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:07:03,726 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:07:03,727 - StatisticalSemPRE - INFO - 加载数据（纯统计学习版）
+2025-12-29 21:07:03,727 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:07:03,733 - StatisticalSemPRE - INFO - ✓ 从CSV加载了 1344 条消息
+2025-12-29 21:07:03,733 - StatisticalSemPRE - INFO -   ✓ 从JSON加载Ground Truth: 6 项
+2025-12-29 21:07:03,733 - StatisticalSemPRE - INFO - ✓ 加载了Ground Truth
+2025-12-29 21:07:03,735 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 21:07:03,735 - StatisticalSemPRE - INFO - SemPRE: Protocol-Agnostic Statistical Learning
+2025-12-29 21:07:03,735 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:07:03,735 - StatisticalSemPRE - INFO - 
+### Experiment 1: Statistical Format Inference
+2025-12-29 21:07:03,735 - StatisticalSemPRE - INFO - 使用纯统计方法（熵+IoC）...
+2025-12-29 21:07:03,755 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:07:03,755 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:07:03,758 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:07:03,758 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:07:03,761 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:07:03,761 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 104, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:07:03,789 - StatisticalSemPRE - INFO - ✓ F1 Score: 0.1876
+2025-12-29 21:07:03,789 - StatisticalSemPRE - INFO - ✓ Perfect Score: 0.0000
+2025-12-29 21:07:03,789 - StatisticalSemPRE - INFO - ✓ Precision: 0.2395
+2025-12-29 21:07:03,789 - StatisticalSemPRE - INFO - ✓ Recall: 0.1577
+2025-12-29 21:07:03,789 - StatisticalSemPRE - INFO - ✓ Perfect Matches: 0/1344
+2025-12-29 21:07:03,789 - StatisticalSemPRE - INFO - 
+### Experiment 2: Protocol-Agnostic Constraint Discovery
+2025-12-29 21:07:03,810 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:07:03,810 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:07:03,812 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:07:03,814 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:07:03,815 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:07:03,815 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 104, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:07:03,835 - StatisticalSemPRE - INFO - ✓ 检测到 1 个长度字段
+2025-12-29 21:07:03,835 - StatisticalSemPRE - INFO - ✓ 发现 1 个长度控制约束
+2025-12-29 21:07:03,835 - StatisticalSemPRE - INFO - 跳过SDG构建（提速优化）
+2025-12-29 21:07:03,835 - StatisticalSemPRE - INFO - ✓ 总约束数: 1
+2025-12-29 21:07:03,836 - StatisticalSemPRE - INFO - ✓ 算术约束: 0
+2025-12-29 21:07:03,836 - StatisticalSemPRE - INFO - 
+### Experiment 3: Zero-Shot Function Inference (No Position Assumptions)
+2025-12-29 21:07:03,838 - StatisticalSemPRE - INFO -   推断类型字段位置: offset 10
+2025-12-29 21:07:03,839 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:07:03,839 - StatisticalSemPRE - INFO - SemPRE: Zero-Shot Function Semantic Inference
+2025-12-29 21:07:03,839 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:07:03,839 - StatisticalSemPRE - INFO - ✓ FC 0x00 -> WRITE (conf=0.80)
+2025-12-29 21:07:03,839 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,16B) | FIELDS(5) | SIZE(21B)
+2025-12-29 21:07:03,841 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,841 - StatisticalSemPRE - INFO - ✓ FC 0x04 -> Filesystem_Op (conf=0.47)
+2025-12-29 21:07:03,841 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:07:03,841 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 21:07:03,841 - StatisticalSemPRE - INFO - ✓ FC 0x4F -> WRITE (conf=0.80)
+2025-12-29 21:07:03,841 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,23B) | FIELDS(7) | SIZE(30B)
+2025-12-29 21:07:03,841 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO - ✓ FC 0x30 -> Filesystem_Op (conf=0.70)
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,73B) | FIELDS(22) | SIZE(89B)
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 73B; Size in range [50, 1000]: 89B
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO - ✓ FC 0x32 -> WRITE (conf=0.80)
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(count_dependent,212B) | FIELDS(57) | SIZE(228B)
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO - ✓ FC 0x05 -> Filesystem_Op (conf=0.70)
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,223B) | FIELDS(59) | SIZE(239B)
+2025-12-29 21:07:03,842 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 223B; Size in range [50, 1000]: 239B
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO - ✓ FC 0xA3 -> READ (conf=0.60)
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO - ✓ FC 0x83 -> READ (conf=0.60)
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO - ✓ FC 0x01 -> Filesystem_Op (conf=0.47)
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,13B) | FIELDS(4) | SIZE(17B)
+2025-12-29 21:07:03,844 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 13B
+2025-12-29 21:07:03,845 - StatisticalSemPRE - INFO - ✓ FC 0xC2 -> Filesystem_Op (conf=0.47)
+2025-12-29 21:07:03,845 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:07:03,845 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 21:07:03,845 - StatisticalSemPRE - INFO - ✓ FC 0x03 -> READ (conf=0.60)
+2025-12-29 21:07:03,845 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,9B) | FIELDS(3) | SIZE(12B)
+2025-12-29 21:07:03,845 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,845 - StatisticalSemPRE - INFO - ✓ FC 0x0F -> Filesystem_Op (conf=0.47)
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO - ✓ FC 0x1E -> WRITE (conf=0.80)
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,205B) | FIELDS(55) | SIZE(221B)
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO - ✓ FC 0xFF -> READ (conf=0.60)
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,9B) | FIELDS(3) | SIZE(12B)
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:07:03,847 - StatisticalSemPRE - INFO - 
+Inferred 14 unknown function codes
+2025-12-29 21:07:03,848 - StatisticalSemPRE - INFO - 
+### Experiment 4: Data Efficiency
+2025-12-29 21:07:03,848 - StatisticalSemPRE - INFO - 
+  Testing with 10% data (134 messages)
+2025-12-29 21:07:03,851 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 5.82
+2025-12-29 21:07:03,852 - StatisticalSemPRE - INFO -   重合指数范围: 0.000 - 1.000
+2025-12-29 21:07:03,854 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:07:03,854 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:07:03,855 - StatisticalSemPRE - INFO -   方差边界检测: 15 个
+2025-12-29 21:07:03,855 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 26, 29, 36, 38, 53, 59, 93, 115, 209, 213, 215]
+2025-12-29 21:07:03,858 - StatisticalSemPRE - INFO -   F1 Score: 0.1791
+2025-12-29 21:07:03,858 - StatisticalSemPRE - INFO - 
+  Testing with 30% data (403 messages)
+2025-12-29 21:07:03,866 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.18
+2025-12-29 21:07:03,867 - StatisticalSemPRE - INFO -   重合指数范围: 0.005 - 1.000
+2025-12-29 21:07:03,869 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:07:03,869 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:07:03,871 - StatisticalSemPRE - INFO -   方差边界检测: 3 个
+2025-12-29 21:07:03,872 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 9, 26, 29, 93, 113, 115, 151, 164, 208, 213, 215]
+2025-12-29 21:07:03,880 - StatisticalSemPRE - INFO -   F1 Score: 0.3403
+2025-12-29 21:07:03,880 - StatisticalSemPRE - INFO - 
+  Testing with 50% data (672 messages)
+2025-12-29 21:07:03,892 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.62
+2025-12-29 21:07:03,892 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:07:03,893 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:07:03,895 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:07:03,896 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:07:03,896 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 104, 113, 115, 123, 148, 151, 164, 205, 208, 215]
+2025-12-29 21:07:03,906 - StatisticalSemPRE - INFO -   F1 Score: 0.1865
+2025-12-29 21:07:03,906 - StatisticalSemPRE - INFO - 
+  Testing with 100% data (1344 messages)
+2025-12-29 21:07:03,927 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:07:03,927 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:07:03,930 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:07:03,930 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:07:03,932 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:07:03,932 - StatisticalSemPRE - INFO -   边界候选: [0, 2, 4, 7, 29, 104, 113, 115, 123, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:07:03,952 - StatisticalSemPRE - INFO -   F1 Score: 0.1876
+2025-12-29 21:07:03,952 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 21:07:03,953 - StatisticalSemPRE - INFO - 保存结果
+2025-12-29 21:07:03,953 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:07:03,953 - StatisticalSemPRE - INFO - ✓ Saved JSON: output\statistical\improved_results.json
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO - ✓ Saved CSV: output\statistical\improved_results.csv
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO - 实验总结（纯统计学习）
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO - 
+ 关键指标:
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO -   • F1 Score: 0.1876
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO -   • Perfect Score: 0.0000
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO -   • Precision: 0.2395
+2025-12-29 21:07:03,955 - StatisticalSemPRE - INFO -   • Recall: 0.1577
+2025-12-29 21:07:03,956 - StatisticalSemPRE - INFO -   • 长度约束: 1 个
+2025-12-29 21:07:03,956 - StatisticalSemPRE - INFO -   • 检测方法: statistical
+2025-12-29 21:07:03,956 - StatisticalSemPRE - INFO - 
+ 注意：
+2025-12-29 21:07:03,956 - StatisticalSemPRE - INFO -   - 本版本使用纯统计学习，无Modbus特定知识
+2025-12-29 21:07:03,956 - StatisticalSemPRE - INFO -   - 分数反映算法的真实学习能力，而非规则匹配
+2025-12-29 21:07:03,956 - StatisticalSemPRE - INFO -   - 评估重点：泛化能力 > 单一协议准确率
+2025-12-29 21:11:14,911 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:11:14,911 - StatisticalSemPRE - INFO - 加载数据（纯统计学习版）
+2025-12-29 21:11:14,911 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:11:14,919 - StatisticalSemPRE - INFO - ✓ 从CSV加载了 1344 条消息
+2025-12-29 21:11:14,919 - StatisticalSemPRE - INFO -   ✓ 从JSON加载Ground Truth: 6 项
+2025-12-29 21:11:14,920 - StatisticalSemPRE - INFO - ✓ 加载了Ground Truth
+2025-12-29 21:11:14,920 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 21:11:14,920 - StatisticalSemPRE - INFO - SemPRE: Protocol-Agnostic Statistical Learning
+2025-12-29 21:11:14,920 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:11:14,920 - StatisticalSemPRE - INFO - 
+### Experiment 1: Statistical Format Inference
+2025-12-29 21:11:14,920 - StatisticalSemPRE - INFO - 使用纯统计方法（熵+IoC）...
+2025-12-29 21:11:14,940 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:11:14,941 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:11:14,943 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:11:14,943 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:11:14,946 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:11:14,946 - StatisticalSemPRE - INFO -   边界候选: [0, 1, 2, 4, 7, 8, 12, 113, 115, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:11:14,992 - StatisticalSemPRE - INFO - ✓ F1 Score: 0.3290
+2025-12-29 21:11:14,992 - StatisticalSemPRE - INFO - ✓ Perfect Score: 0.0000
+2025-12-29 21:11:14,992 - StatisticalSemPRE - INFO - ✓ Precision: 0.3301
+2025-12-29 21:11:14,992 - StatisticalSemPRE - INFO - ✓ Recall: 0.3326
+2025-12-29 21:11:14,992 - StatisticalSemPRE - INFO - ✓ Perfect Matches: 0/1344
+2025-12-29 21:11:14,993 - StatisticalSemPRE - INFO - 
+### Experiment 2: Protocol-Agnostic Constraint Discovery
+2025-12-29 21:11:15,014 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:11:15,014 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:11:15,016 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:11:15,016 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:11:15,019 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:11:15,019 - StatisticalSemPRE - INFO -   边界候选: [0, 1, 2, 4, 7, 8, 12, 113, 115, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:11:15,051 - StatisticalSemPRE - INFO - ✓ 检测到 1 个长度字段
+2025-12-29 21:11:15,051 - StatisticalSemPRE - INFO - ✓ 发现 1 个长度控制约束
+2025-12-29 21:11:15,052 - StatisticalSemPRE - INFO - 跳过SDG构建（提速优化）
+2025-12-29 21:11:15,052 - StatisticalSemPRE - INFO - ✓ 总约束数: 1
+2025-12-29 21:11:15,052 - StatisticalSemPRE - INFO - ✓ 算术约束: 0
+2025-12-29 21:11:15,052 - StatisticalSemPRE - INFO - 
+### Experiment 3: Zero-Shot Function Inference (No Position Assumptions)
+2025-12-29 21:11:15,055 - StatisticalSemPRE - INFO -   推断类型字段位置: offset 10
+2025-12-29 21:11:15,055 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:11:15,055 - StatisticalSemPRE - INFO - SemPRE: Zero-Shot Function Semantic Inference
+2025-12-29 21:11:15,055 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO - ✓ FC 0x00 -> WRITE (conf=0.80)
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,16B) | FIELDS(5) | SIZE(21B)
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO - ✓ FC 0x04 -> Filesystem_Op (conf=0.47)
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO - ✓ FC 0x4F -> WRITE (conf=0.80)
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(variable,23B) | FIELDS(7) | SIZE(30B)
+2025-12-29 21:11:15,057 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,058 - StatisticalSemPRE - INFO - ✓ FC 0x30 -> Filesystem_Op (conf=0.70)
+2025-12-29 21:11:15,058 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,73B) | FIELDS(22) | SIZE(89B)
+2025-12-29 21:11:15,058 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 73B; Size in range [50, 1000]: 89B
+2025-12-29 21:11:15,058 - StatisticalSemPRE - INFO - ✓ FC 0x32 -> WRITE (conf=0.80)
+2025-12-29 21:11:15,058 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(count_dependent,212B) | FIELDS(57) | SIZE(228B)
+2025-12-29 21:11:15,058 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,058 - StatisticalSemPRE - INFO - ✓ FC 0x05 -> Filesystem_Op (conf=0.70)
+2025-12-29 21:11:15,060 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,223B) | FIELDS(59) | SIZE(239B)
+2025-12-29 21:11:15,060 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 223B; Size in range [50, 1000]: 239B
+2025-12-29 21:11:15,060 - StatisticalSemPRE - INFO - ✓ FC 0xA3 -> READ (conf=0.60)
+2025-12-29 21:11:15,060 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:11:15,060 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,060 - StatisticalSemPRE - INFO - ✓ FC 0x83 -> READ (conf=0.60)
+2025-12-29 21:11:15,060 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:11:15,061 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,061 - StatisticalSemPRE - INFO - ✓ FC 0x01 -> Filesystem_Op (conf=0.47)
+2025-12-29 21:11:15,061 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,13B) | FIELDS(4) | SIZE(17B)
+2025-12-29 21:11:15,061 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 13B
+2025-12-29 21:11:15,061 - StatisticalSemPRE - INFO - ✓ FC 0xC2 -> Filesystem_Op (conf=0.47)
+2025-12-29 21:11:15,061 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:11:15,063 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 21:11:15,063 - StatisticalSemPRE - INFO - ✓ FC 0x03 -> READ (conf=0.60)
+2025-12-29 21:11:15,063 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,9B) | FIELDS(3) | SIZE(12B)
+2025-12-29 21:11:15,063 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,063 - StatisticalSemPRE - INFO - ✓ FC 0x0F -> Filesystem_Op (conf=0.47)
+2025-12-29 21:11:15,063 - StatisticalSemPRE - INFO -   Fingerprint: COUNT_FIELDS(1) | PAYLOAD(fixed,10B) | FIELDS(3) | SIZE(13B)
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO -   Evidence: Filesystem: Large variable payload, no address; Has payload: fixed, 10B
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO - ✓ FC 0x1E -> WRITE (conf=0.80)
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,205B) | FIELDS(55) | SIZE(221B)
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO -   Evidence: WRITE: Has address+count+payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO - ✓ FC 0xFF -> READ (conf=0.60)
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO -   Fingerprint: ADDRESS_FIELDS(1) | COUNT_FIELDS(1) | PAYLOAD(fixed,9B) | FIELDS(3) | SIZE(12B)
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO -   Evidence: READ: Has address+count, no/small payload; Has address field(s): 1; Has count field(s): 1
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO - 
+Inferred 14 unknown function codes
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO - 
+### Experiment 4: Data Efficiency
+2025-12-29 21:11:15,064 - StatisticalSemPRE - INFO - 
+  Testing with 10% data (134 messages)
+2025-12-29 21:11:15,069 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 5.82
+2025-12-29 21:11:15,070 - StatisticalSemPRE - INFO -   重合指数范围: 0.000 - 1.000
+2025-12-29 21:11:15,072 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:11:15,072 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:11:15,075 - StatisticalSemPRE - INFO -   方差边界检测: 15 个
+2025-12-29 21:11:15,075 - StatisticalSemPRE - INFO -   边界候选: [0, 1, 2, 4, 7, 8, 12, 26, 29, 53, 93, 115, 209, 213, 215]
+2025-12-29 21:11:15,078 - StatisticalSemPRE - INFO -   F1 Score: 0.3211
+2025-12-29 21:11:15,080 - StatisticalSemPRE - INFO - 
+  Testing with 30% data (403 messages)
+2025-12-29 21:11:15,089 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.18
+2025-12-29 21:11:15,089 - StatisticalSemPRE - INFO -   重合指数范围: 0.005 - 1.000
+2025-12-29 21:11:15,090 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:11:15,090 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:11:15,093 - StatisticalSemPRE - INFO -   方差边界检测: 3 个
+2025-12-29 21:11:15,093 - StatisticalSemPRE - INFO -   边界候选: [0, 1, 2, 4, 7, 8, 12, 29, 93, 113, 115, 151, 208, 213, 215]
+2025-12-29 21:11:15,104 - StatisticalSemPRE - INFO -   F1 Score: 0.3251
+2025-12-29 21:11:15,104 - StatisticalSemPRE - INFO - 
+  Testing with 50% data (672 messages)
+2025-12-29 21:11:15,115 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.62
+2025-12-29 21:11:15,116 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:11:15,118 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:11:15,118 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:11:15,121 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:11:15,121 - StatisticalSemPRE - INFO -   边界候选: [0, 1, 2, 4, 7, 8, 12, 29, 113, 115, 151, 164, 205, 208, 215]
+2025-12-29 21:11:15,137 - StatisticalSemPRE - INFO -   F1 Score: 0.3274
+2025-12-29 21:11:15,137 - StatisticalSemPRE - INFO - 
+  Testing with 100% data (1344 messages)
+2025-12-29 21:11:15,159 - StatisticalSemPRE - INFO -   字节熵范围: 0.00 - 7.90
+2025-12-29 21:11:15,159 - StatisticalSemPRE - INFO -   重合指数范围: 0.004 - 1.000
+2025-12-29 21:11:15,161 - StatisticalSemPRE - INFO -   MI边界检测: 1 个
+2025-12-29 21:11:15,161 - StatisticalSemPRE - INFO -   TLV边界检测: 10 个
+2025-12-29 21:11:15,162 - StatisticalSemPRE - INFO -   方差边界检测: 2 个
+2025-12-29 21:11:15,164 - StatisticalSemPRE - INFO -   边界候选: [0, 1, 2, 4, 7, 8, 12, 113, 115, 151, 164, 205, 208, 213, 215]
+2025-12-29 21:11:15,196 - StatisticalSemPRE - INFO -   F1 Score: 0.3290
+2025-12-29 21:11:15,196 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 21:11:15,196 - StatisticalSemPRE - INFO - 保存结果
+2025-12-29 21:11:15,196 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:11:15,197 - StatisticalSemPRE - INFO - ✓ Saved JSON: output\statistical\improved_results.json
+2025-12-29 21:11:15,197 - StatisticalSemPRE - INFO - ✓ Saved CSV: output\statistical\improved_results.csv
+2025-12-29 21:11:15,197 - StatisticalSemPRE - INFO - 
+======================================================================
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO - 实验总结（纯统计学习）
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO - ======================================================================
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO - 
+ 关键指标:
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   • F1 Score: 0.3290
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   • Perfect Score: 0.0000
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   • Precision: 0.3301
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   • Recall: 0.3326
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   • 长度约束: 1 个
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   • 检测方法: statistical
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO - 
+ 注意：
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   - 本版本使用纯统计学习，无Modbus特定知识
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   - 分数反映算法的真实学习能力，而非规则匹配
+2025-12-29 21:11:15,199 - StatisticalSemPRE - INFO -   - 评估重点：泛化能力 > 单一协议准确率

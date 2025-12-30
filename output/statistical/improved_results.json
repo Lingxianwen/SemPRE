@@ -1,19 +1,30 @@
 {
   "exp1_format_inference": {
-    "precision": 0.6344494047619048,
-    "recall": 0.3153787556689342,
-    "f1_score": 0.4141981034838177,
+    "precision": 0.33013392857142854,
+    "recall": 0.3325848568594104,
+    "f1_score": 0.32898297139368565,
     "perfect_score": 0.0,
     "detection_method": "statistical",
     "total_samples": 1344
   },
   "exp2_constraint_discovery": {
-    "length_fields_detected": 0,
-    "length_constraints": 0,
+    "length_fields_detected": 1,
+    "length_constraints": 1,
     "arithmetic_constraints": 0,
     "logical_constraints": 0,
-    "total_constraints": 0,
-    "constraint_details": [],
+    "total_constraints": 1,
+    "constraint_details": [
+      {
+        "type": "length_control",
+        "source_field": [
+          4,
+          6
+        ],
+        "constraint": "Field[4:6] = len(msg) - 6",
+        "confidence": 1.0,
+        "validated_samples": 100
+      }
+    ],
     "sdg_stats": {
       "arithmetic_constraints": 0,
       "logical_constraints": 0,
@@ -96,22 +107,22 @@
       {
         "data_ratio": 0.1,
         "sample_size": 134,
-        "f1_score": 0.3922470978441127
+        "f1_score": 0.32110281923714756
       },
       {
         "data_ratio": 0.3,
         "sample_size": 403,
-        "f1_score": 0.5561352212716976
+        "f1_score": 0.32514690421565334
       },
       {
         "data_ratio": 0.5,
         "sample_size": 672,
-        "f1_score": 0.41148225903865004
+        "f1_score": 0.32741589550800076
       },
       {
         "data_ratio": 1.0,
         "sample_size": 1344,
-        "f1_score": 0.4141981034838177
+        "f1_score": 0.32898297139368565
       }
     ]
   }
