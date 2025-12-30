@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+HierPRE - Hierarchical Protocol Reverse Engineering Framework
+层次化协议逆向工程框架
+
+创新点：
+1. 多粒度语义感知图 (Multi-Granularity Semantic-Aware Graph)
+2. 跨消息依赖挖掘 (Cross-Message Dependency Mining)
+3. 未知功能码零样本推断 (Zero-Shot Function Code Inference)
+4. Bit-level语义注意力 (Bit-level Semantic Attention)
+5. 算术/逻辑约束发现 (Arithmetic/Logical Constraint Discovery)
+
+步骤：
 1. 加载追踪数据
 2. 协议预分析
 3. 上下文感知字段检测 + 语义图构建
