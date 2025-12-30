@@ -1,0 +1,33 @@
+Field Specification
+==================================================
+
+Total messages analyzed: 100
+Message length range: 10-215 bytes
+Average message length: 61.4 bytes
+
+Detected Fields:
+--------------------------------------------------
+Bytes   0-  2: transaction_id  (length: 2, unique values: 50)
+           Sample: 001f
+           Sample: 002e
+           Sample: 0014
+Bytes   2-  4: constant        (length: 2, unique values: 1)
+           Sample: 0000
+Bytes   4-  6: variable        (length: 2, unique values: 16)
+           Sample: 00cb
+           Sample: 0014
+           Sample: 00cf
+Bytes   6-  7: constant        (length: 1, unique values: 1)
+           Sample: ff
+Bytes   7-  8: enum            (length: 1, unique values: 7)
+           Sample: 01
+           Sample: 10
+           Sample: 0f
+Bytes   8- 10: variable        (length: 2, unique values: 27)
+           Sample: 0dad
+           Sample: 0000
+           Sample: c0dc
+Bytes  10- 12: variable        (length: 2, unique values: 28)
+           Sample: 0000
+           Sample: cb84
+           Sample: 29ed

@@ -1,0 +1,112 @@
+{
+  "timestamp": "2025-11-28 15:54:02",
+  "configuration": {
+    "modbus_mode": true,
+    "max_messages": 100,
+    "log_level": "INFO"
+  },
+  "metrics": {
+    "start_time": 1764316442.4413188,
+    "end_time": null,
+    "messages_processed": 1980,
+    "fields_detected": 8,
+    "errors": []
+  },
+  "analysis": {
+    "field_boundaries": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "field_types": {
+      "0-2": {
+        "type": "transaction_id",
+        "unique_values": 50,
+        "length": 2,
+        "sample_values": [
+          "001f",
+          "002e",
+          "0014",
+          "0021",
+          "0013"
+        ]
+      },
+      "2-4": {
+        "type": "constant",
+        "unique_values": 1,
+        "length": 2,
+        "sample_values": [
+          "0000"
+        ]
+      },
+      "4-6": {
+        "type": "variable",
+        "unique_values": 16,
+        "length": 2,
+        "sample_values": [
+          "00cb",
+          "0014",
+          "00cf",
+          "00c3",
+          "00c5"
+        ]
+      },
+      "6-7": {
+        "type": "constant",
+        "unique_values": 1,
+        "length": 1,
+        "sample_values": [
+          "ff"
+        ]
+      },
+      "7-8": {
+        "type": "enum",
+        "unique_values": 7,
+        "length": 1,
+        "sample_values": [
+          "01",
+          "10",
+          "0f",
+          "17",
+          "03"
+        ]
+      },
+      "8-10": {
+        "type": "variable",
+        "unique_values": 27,
+        "length": 2,
+        "sample_values": [
+          "0dad",
+          "0000",
+          "c0dc",
+          "c4e9",
+          "bede"
+        ]
+      },
+      "10-12": {
+        "type": "variable",
+        "unique_values": 28,
+        "length": 2,
+        "sample_values": [
+          "0000",
+          "cb84",
+          "29ed",
+          "1564",
+          "2dc3"
+        ]
+      }
+    },
+    "message_statistics": {
+      "total_messages": 1980,
+      "analyzed_messages": 100,
+      "min_length": 10,
+      "max_length": 215,
+      "avg_length": 61.36
+    }
+  }
+}
