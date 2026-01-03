@@ -1,0 +1,6 @@
+Raw 0 160 S
+Raw 0 16 D
+Raw 0 240 S
+Raw 0 16 D
+Raw 0 16 D
+Raw 0 192 S
